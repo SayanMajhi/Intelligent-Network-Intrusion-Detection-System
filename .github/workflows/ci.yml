@@ -1,0 +1,57 @@
+name: checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Byte-compile sources
+        run: python -m py_compile src/*.py experiments/run_experiments.py docs/report/build_docx.py
+
+      - name: Import modules and load the dataset
+        working-directory: src
+        run: |
+          python -c "import config, data_loader, preprocessing, feature_selection, autoencoder, subspace_autoencoder, models, evaluate"
+          python data_loader.py
+
+      - name: Fit the pipeline on a 5k-record subsample
+        # Exercises preprocessing, HRA-FS, both autoencoders and the stacked ensemble end to end.
+        working-directory: src
+        run: |
+          python - <<'EOF'
+          import numpy as np
+          from data_loader import load_nsl_kdd
+          from preprocessing import preprocess
+          from feature_selection import hybrid_rank_selection
+          from autoencoder import NormalProfileAutoencoder
+          from subspace_autoencoder import KitNETLite
+          from models import build_aese
+          tr, te = load_nsl_kdd()
+          tr = tr.sample(5000, random_state=0)
+          Xtr, Xte, names, _ = preprocess(tr, te.head(500))
+          y = tr["is_attack"].to_numpy()
+          mask, _ = hybrid_rank_selection(Xtr, y, names, k=20)
+          ae = NormalProfileAutoencoder(epochs=3).fit(Xtr[y == 0])
+          kit = KitNETLite(m=10, epochs=3).fit(Xtr[y == 0])
+          X = np.hstack([Xtr[:, mask], kit.group_scores(Xtr)])
+          model = build_aese(2, n_passthrough=X.shape[1] - mask.sum())
+          model.fit(X, y, groups=tr["label"].to_numpy())
+          acc = (model.predict(np.hstack([Xte[:, mask], kit.group_scores(Xte)])) == te.head(500)["is_attack"].to_numpy()).mean()
+          print(f"smoke accuracy on 500 test rows: {acc:.3f}")
+          assert 0.5 < acc <= 1.0
+          EOF
