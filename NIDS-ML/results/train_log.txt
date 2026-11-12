@@ -1,0 +1,80 @@
+[1/6] Loading NSL-KDD ...
+          KDDTrain+  KDDTest+
+category                     
+Normal        67343      9711
+DoS           45927      7460
+Probe         11656      2421
+R2L             995      2885
+U2R              52        67
+Total        125973     22544
+[2/6] Pre-processing ...
+   encoded feature space: 122 columns
+[3/6] Hybrid rank-aggregated feature selection ...
+   kept 40 / 122 features
+[4/6] Training normal-profile autoencoder ...
+[5/6] Binary classification (Normal vs Attack) ...
+   [binary] training Logistic Regression ... acc=0.7566 f1=0.7472 (0.2s)
+   [binary] training Naive Bayes ... acc=0.8108 f1=0.8145 (0.1s)
+   [binary] training Decision Tree ... acc=0.8046 f1=0.8054 (1.0s)
+   [binary] training KNN (k=5) ... acc=0.7652 f1=0.7572 (0.0s)
+   [binary] training Linear SVM ... acc=0.7602 f1=0.7517 (0.7s)
+   [binary] training MLP ... acc=0.8003 f1=0.8013 (12.6s)
+   [binary] training Random Forest ... acc=0.7865 f1=0.7746 (5.4s)
+   [binary] training Extra Trees ... acc=0.7709 f1=0.7639 (5.0s)
+   [binary] training XGBoost ... acc=0.8099 f1=0.8065 (1.7s)
+   [binary] training LightGBM ... acc=0.8091 f1=0.8034 (1.7s)
+   [binary] training Proposed AESE-NIDS ... acc=0.8411 f1=0.8491 (147.7s)
+                                 accuracy  ...  false_alarm_rate
+model                                      ...                  
+Logistic Regression                0.7566  ...            0.0787
+Naive Bayes                        0.8108  ...            0.0820
+Decision Tree                      0.8046  ...            0.0705
+KNN (k=5)                          0.7652  ...            0.0733
+Linear SVM                         0.7602  ...            0.0776
+MLP                                0.8003  ...            0.0767
+Random Forest                      0.7865  ...            0.0262
+Extra Trees                        0.7709  ...            0.0708
+XGBoost                            0.8099  ...            0.0391
+LightGBM                           0.8091  ...            0.0271
+Proposed AESE-NIDS                 0.8411  ...            0.0853
+Autoencoder only (unsupervised)    0.8672  ...            0.0933
+
+[12 rows x 6 columns]
+[5/6] Multi-class classification (5 categories) ...
+   [5-class] training Logistic Regression ... acc=0.7997 f1=0.6187 (1.9s)
+   [5-class] training Naive Bayes ... acc=0.7487 f1=0.5599 (0.1s)
+   [5-class] training Decision Tree ... acc=0.7267 f1=0.5270 (0.6s)
+   [5-class] training KNN (k=5) ... acc=0.7521 f1=0.5175 (0.0s)
+   [5-class] training Linear SVM ... acc=0.7638 f1=0.6025 (2.5s)
+   [5-class] training MLP ... acc=0.7634 f1=0.6131 (25.1s)
+   [5-class] training Random Forest ... acc=0.7382 f1=0.4888 (5.3s)
+   [5-class] training Extra Trees ... acc=0.7488 f1=0.5036 (5.2s)
+   [5-class] training XGBoost ... acc=0.7934 f1=0.5789 (9.8s)
+   [5-class] training LightGBM ... acc=0.7931 f1=0.6023 (6.9s)
+   [5-class] training Proposed AESE-NIDS ... acc=0.7852 f1=0.6079 (297.0s)
+                     accuracy  precision  recall      f1     mcc
+model                                                           
+Logistic Regression    0.7997     0.6621  0.7129  0.6187  0.7070
+Naive Bayes            0.7487     0.5833  0.6813  0.5599  0.6531
+Decision Tree          0.7267     0.7646  0.5124  0.5270  0.5957
+KNN (k=5)              0.7521     0.7020  0.5217  0.5175  0.6371
+Linear SVM             0.7638     0.7202  0.6398  0.6025  0.6515
+MLP                    0.7634     0.7239  0.5757  0.6131  0.6471
+Random Forest          0.7382     0.7562  0.4806  0.4888  0.6229
+Extra Trees            0.7488     0.7590  0.4958  0.5036  0.6380
+XGBoost                0.7934     0.8230  0.5598  0.5789  0.7022
+LightGBM               0.7931     0.7927  0.5883  0.6023  0.7020
+Proposed AESE-NIDS     0.7852     0.6860  0.7123  0.6079  0.6966
+
+Unseen-attack detection rate:
+                     unseen_attack_detection_rate
+model                                           
+Random Forest                             0.3424
+XGBoost                                   0.4907
+LightGBM                                  0.4496
+Proposed AESE-NIDS                        0.6485
+[6/6] Ablation study ...
+   A: all 122 features, RF                            binary   acc=0.7689 f1=0.7517
+   A: all 122 features, RF                            5-class  acc=0.7366 f1=0.4717
+   B: HRA-FS (k=40), RF                               binary   acc=0.7795 f1=0.7658
+   B: HRA-FS (k=40), RF                               5-class  acc=0.7382 f1=0.4885
