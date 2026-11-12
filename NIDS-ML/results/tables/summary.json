@@ -1,0 +1,74 @@
+{
+  "n_train": 125973,
+  "n_test": 22544,
+  "n_encoded_features": 122,
+  "n_selected_features": 40,
+  "test21_binary": {
+    "model": "Proposed AESE-NIDS",
+    "task": "binary",
+    "accuracy": 0.7456540084388186,
+    "f1": 0.832982378366397,
+    "detection_rate": 0.7750051557022066,
+    "false_alarm_rate": 0.38661710037174724
+  },
+  "test21_multiclass": {
+    "model": "Proposed AESE-NIDS",
+    "task": "5-class",
+    "accuracy": 0.5967932489451476,
+    "f1": 0.5202012924151387,
+    "detection_rate": NaN,
+    "false_alarm_rate": NaN
+  },
+  "unseen_attack_types": [
+    "apache2",
+    "httptunnel",
+    "mailbomb",
+    "mscan",
+    "named",
+    "processtable",
+    "ps",
+    "saint",
+    "sendmail",
+    "snmpgetattack",
+    "snmpguess",
+    "sqlattack",
+    "udpstorm",
+    "worm",
+    "xlock",
+    "xsnoop",
+    "xterm"
+  ],
+  "n_unseen_test_rows": 3750,
+  "ae_threshold": 0.0067553333938121796,
+  "n_subspaces": 31,
+  "timings_s": {
+    "feature_selection": 94.84278239999549,
+    "autoencoder": 17.351179699995555,
+    "subspace_ae": 68.32232649999787,
+    "cv": 958.9758236999915
+  },
+  "cv_accuracy_mean": 0.9968405954078943,
+  "cv_accuracy_std": 0.00048583138289736734,
+  "proposed_binary": {
+    "accuracy": 0.865152590489709,
+    "precision": 0.9254496481014858,
+    "recall": 0.8299696096002493,
+    "f1": 0.8751129734615068,
+    "mcc": 0.7346328020257756,
+    "detection_rate": 0.8299696096002493,
+    "false_alarm_rate": 0.08835341365461848,
+    "train_time_s": 263.1685839999991,
+    "test_time_s": 0.32860179999261163,
+    "us_per_sample": 14.576020226783696
+  },
+  "proposed_multiclass": {
+    "accuracy": 0.7852200141944642,
+    "precision": 0.6859613145373296,
+    "recall": 0.7123459276122567,
+    "f1": 0.6078628063584295,
+    "mcc": 0.6965968117671906,
+    "train_time_s": 393.9045083999954,
+    "test_time_s": 1.2187170999968657,
+    "us_per_sample": 54.05948811199724
+  }
+}

@@ -1,0 +1,24 @@
+KDDTest-21 has 11850 records (52.6% of KDDTest+)
+setup done in 80s
+E0 baseline (report pipeline)
+  -> E0   binary   KDDTest+   acc=0.8411 f1=0.8491 unseenDR=0.6485
+  -> E0/E1 binary   KDDTest-21 acc=0.7001 f1=0.7962 unseenDR=0.6476
+  -> E0   5-class  KDDTest+   acc=0.7852 f1=0.6079
+  -> E0/E1 5-class  KDDTest-21 acc=0.5968 f1=0.5202
+E2 Shone 2018: + AE bottleneck code as features
+  -> E2   binary   KDDTest+   acc=0.8494 f1=0.8579 unseenDR=0.7037
+  -> E2/E1 binary   KDDTest-21 acc=0.7149 f1=0.8080 unseenDR=0.7029
+  -> E2   5-class  KDDTest+   acc=0.7602 f1=0.5634
+  -> E2/E1 5-class  KDDTest-21 acc=0.5531 f1=0.4748
+Traceback (most recent call last):
+  File "C:\Users\sayan\OneDrive\Desktop\PROJECTS\ML\NIDS-ML\experiments\run_experiments.py", line 136, in <module>
+    kit = KitNETLite(m=10).fit(benign)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sayan\OneDrive\Desktop\PROJECTS\ML\NIDS-ML\experiments\kitnet_lite.py", line 67, in fit
+    Z = self._group_rmse(X_normal)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sayan\OneDrive\Desktop\PROJECTS\ML\NIDS-ML\experiments\kitnet_lite.py", line 80, in _group_rmse
+    out[:, i] = np.sqrt(np.mean((X[:, g] - rec) ** 2, axis=1))
+                                ~~~~~~~~~~~~~~~~^^~~
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 16.9 GiB for an array with shape (67343, 67343) and data type float32
+EXIT=1

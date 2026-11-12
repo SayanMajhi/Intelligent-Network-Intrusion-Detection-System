@@ -69,3 +69,4 @@ N_SELECTED_FEATURES = 40        # features kept after hybrid rank aggregation
 AE_HIDDEN = (32, 8, 32)         # bottleneck autoencoder topology
 AE_EPOCHS = 60
 STACK_CV_FOLDS = 5
+SUBSPACE_MAX_SIZE = 10         # max features per correlation-clustered subspace (Kitsune's m)

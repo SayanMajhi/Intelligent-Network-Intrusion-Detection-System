@@ -1,0 +1,13 @@
+reference,method,binary_accuracy,multiclass_accuracy
+Tavallaee et al. (2009) [1],Naive Bayes,76.56,
+Tavallaee et al. (2009) [1],SVM,69.52,
+Tavallaee et al. (2009) [1],Multi-layer Perceptron,77.41,
+Tavallaee et al. (2009) [1],J48 decision tree,81.05,
+Tavallaee et al. (2009) [1],Random Forest,80.67,
+Tavallaee et al. (2009) [1],NB Tree,82.02,
+Javaid et al. (2016) [4],Self-taught learning (sparse AE + softmax),88.39,79.1
+Yin et al. (2017) [5],RNN-IDS,83.28,81.29
+Shone et al. (2018) [6],Stacked NDAE + RF,,85.42
+Su et al. (2020) [11],BAT-MC (BLSTM + attention),,84.25
+Ieracitano et al. (2020) [12],Statistical analysis + autoencoder,87.0,
+This work (2026),Proposed AESE-NIDS (HRA-FS + AE + stacking),86.52,78.52

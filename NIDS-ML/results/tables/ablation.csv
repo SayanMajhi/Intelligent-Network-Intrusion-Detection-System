@@ -1,0 +1,15 @@
+configuration,task,accuracy,f1
+"A: all 122 features, RF",binary,0.7688520227111426,0.7516561025592146
+"A: all 122 features, RF",5-class,0.7366483321504613,0.47167579254442166
+"B: HRA-FS (k=40), RF",binary,0.779542228530873,0.765809066063519
+"B: HRA-FS (k=40), RF",5-class,0.7382008516678495,0.4885016339751996
+"C: HRA-FS, standard stacking",binary,0.7919623846699787,0.7820631970260223
+"C: HRA-FS, standard stacking",5-class,0.7909421575585521,0.5654307072901079
+"D: HRA-FS + AE feature, RF",binary,0.7864620298083748,0.774625468164794
+"D: HRA-FS + AE feature, RF",5-class,0.7382008516678495,0.48882433436430334
+"E: HRA-FS + AE, standard stacking",binary,0.8124556422995032,0.8075557578516158
+"E: HRA-FS + AE, standard stacking",5-class,0.8011000709723208,0.5859290782820976
+"F: HRA-FS + AE score, novelty-aware stacking (v1)",binary,0.84111071682044,0.8491154170176917
+"F: HRA-FS + AE score, novelty-aware stacking (v1)",5-class,0.7852200141944642,0.6078628063584295
+"G: HRA-FS + subspace profile, novelty-aware stacking (v2)",binary,0.865152590489709,0.8751129734615068
+"G: HRA-FS + subspace profile, novelty-aware stacking (v2)",5-class,0.7683640880056778,0.5695278009810558

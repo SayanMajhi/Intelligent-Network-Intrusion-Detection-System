@@ -1,5 +1,5 @@
 model,unseen_attack_detection_rate
-Random Forest,0.3424
-XGBoost,0.49066666666666664
-LightGBM,0.4496
-Proposed AESE-NIDS,0.6485333333333333
+Random Forest,0.264
+XGBoost,0.41226666666666667
+LightGBM,0.3664
+Proposed AESE-NIDS,0.7962666666666667

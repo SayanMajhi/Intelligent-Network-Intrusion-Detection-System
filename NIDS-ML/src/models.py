@@ -54,11 +54,12 @@ class NoveltyAwareStacking(BaseEstimator, ClassifierMixin):
     """
 
     def __init__(self, n_classes=2, n_folds=STACK_CV_FOLDS, novelty_aware=True,
-                 ae_passthrough=True, random_state=RANDOM_STATE):
+                 ae_passthrough=True, n_passthrough=1, random_state=RANDOM_STATE):
         self.n_classes = n_classes
         self.n_folds = n_folds
         self.novelty_aware = novelty_aware
         self.ae_passthrough = ae_passthrough
+        self.n_passthrough = n_passthrough      # how many trailing columns of X go straight to the meta-learner
         self.random_state = random_state
 
     # ------------------------------------------------------------------ folds
@@ -137,7 +138,7 @@ class NoveltyAwareStacking(BaseEstimator, ClassifierMixin):
 
     def _meta_features(self, oof, X):
         if self.ae_passthrough:
-            return np.hstack([oof, X[:, -1:]])
+            return np.hstack([oof, X[:, -self.n_passthrough:]])
         return oof
 
     def _level0(self, X):
@@ -155,13 +156,13 @@ class NoveltyAwareStacking(BaseEstimator, ClassifierMixin):
         """Return a (n_meta_classes, n_meta_features) table of meta-learner coefficients."""
         names = [f"{b}:P({c})" for b in self.base_names_ for c in self.classes_]
         if self.ae_passthrough:
-            names.append("ae_score")
+            names += [f"passthrough_{i}" for i in range(self.n_passthrough)] if self.n_passthrough > 1 else ["ae_score"]
         return names, self.meta_.coef_
 
 
-def build_aese(n_classes, novelty_aware=True, ae_passthrough=True):
+def build_aese(n_classes, novelty_aware=True, ae_passthrough=True, n_passthrough=1):
     return NoveltyAwareStacking(n_classes=n_classes, novelty_aware=novelty_aware,
-                                ae_passthrough=ae_passthrough)
+                                ae_passthrough=ae_passthrough, n_passthrough=n_passthrough)
 
 
 def baseline_models(n_classes):
