@@ -1,57 +1,27 @@
 # Research notes – how this project actually went
-
-These are my working notes for the NIDS project, kept as I went. I'm leaving the dead
-ends in because they're half the point: most of what I learned came from things that
-didn't work the first time. Numbers here are copied from `experiments/results.csv` and
-`results/tables/`, which the scripts write automatically, so they can be re-checked.
-
-Papers I read are in `docs/papers/`.
-
 ---
 
-## 1. Where I started (week 1)
+## 1. Where I started (Week 1)
 
-Goal from the brief: build an ML-based intrusion detector on NSL-KDD and propose
-something of our own, not just run sklearn on the CSV.
+The first version of the pipeline (`src/train.py`) looked good on paper: one-hot, log, and min-max preprocessing, Borda-count feature selection (keeping the top 40 features via mutual info, ANOVA F, and Extra-Trees), a benign-only autoencoder (AE) providing reconstruction error as an extra feature, and a stacked ensemble (RF, ExtraTrees, XGBoost, LightGBM) with a logistic regression meta-learner.
 
-First version (`src/train.py`, first run): one-hot + log + min-max preprocessing, a
-hybrid feature selection (mutual info + ANOVA F + Extra-Trees importance, fused with a
-Borda count, keep 40), a benign-only autoencoder whose reconstruction error is added as
-a feature, and a stacked ensemble of RF / ExtraTrees / XGBoost / LightGBM with logistic
-regression on top. Sounded good on paper.
+The results on `KDDTest+` (binary) were surprising:
 
-Result on KDDTest+ (binary):
+| Model | Accuracy | Detection Rate |
+| --- | --- | --- |
+| XGBoost alone | 81.0% | 68.7% |
+| My stack + AE feature | 80.1% | 67.1% |
+| Autoencoder alone (unsupervised) | 85.8% | 81.8% |
 
-| | accuracy | detection rate |
-|---|---|---|
-| XGBoost alone | 81.0 | 68.7 |
-| my stack + AE feature | 80.1 | 67.1 |
-| autoencoder ALONE, no labels | 85.8 | 81.8 |
+My supervised stack performed *worse* than XGBoost alone, while an unsupervised autoencoder beat everything. That turned out to be the most useful finding of the project. The real challenge on this dataset isn't separating known classes (5-fold CV on the training set hits 99.8%)—it's catching the 17 novel attack types (3,750 rows) that don't appear in the training set at all.
 
-So the fancy supervised stack was *worse* than XGBoost by itself, and an unsupervised
-autoencoder beat everything. That was annoying but it was the most useful result of the
-whole project, because it told me what the real problem on this dataset is: not
-separating the classes (5-fold CV on the training set gives 99.8%), but dealing with
-attack types that are not in the training set at all (17 of them, 3,750 test rows).
+Inspecting the meta-learner showed it gave the AE score a weight of just 0.98, essentially ignoring it. With standard cross-validation, the base trees see every attack type and hit ~99.8% accuracy out-of-fold, so the meta-learner learns to just copy them. It never sees a case where the trees are confidently wrong, so it never learns when to trust the AE.
 
-Looking at the meta-learner's coefficients: it gave the AE score a weight of 0.98,
-basically ignoring it. Reason, once I thought about it: with ordinary cross-validated
-stacking the base models have seen every attack type, their out-of-fold predictions are
-~99.8% right, so the meta-learner learns "just copy the trees". It never sees a case
-where the trees are confidently wrong, so it never learns when to listen to the AE.
+To fix this, I built the meta-training set twice: once with standard stratified folds, and once holding out *entire attack types* per fold (e.g., `neptune` in fold 0, `satan` in fold 1). In that second pass, the trees are blind to the held-out attacks, forcing the meta-learner to learn the pattern: *"trees say normal, AE says weird, label says attack."* This pushed the AE weight from 0.98 to 5.3, binary accuracy from 80.1% to 84.1%, and unseen-attack detection from 49% to 65%—what I called "novelty-aware stacking" in the report.
 
-Fix that worked: build the meta-training set twice, once with normal stratified folds
-and once with folds where *whole attack types* are held out (neptune in fold 0, satan in
-fold 1, ...). In the second pass the trees are genuinely clueless about the held-out
-types, and the meta-learner finally sees "trees say normal, AE says weird, label says
-attack". AE weight went from 0.98 to 5.3 and binary accuracy from 80.1 to 84.1. Unseen-
-attack detection 49% -> 65%. That became the "novelty-aware stacking" in the report.
+One smaller finding: the AE performs better on all 122 features than on the 40 selected ones (84.8% vs. 83.0% on a subsample). Feature selection keeps what separates *known* attacks, while the AE needs the full context of what defines *normal* traffic.
 
-Second small finding: the AE works better on all 122 columns than on the 40 selected
-ones (84.8 vs 83.0 on a subsample). Feature selection keeps what separates the known
-classes; the AE needs what describes normal traffic, which is a different question.
-
-That's the state the report was written in. Then I went back and read properly.
+That's where things stood when I wrote the report—before I went back and started reading the literature properly.
 
 ---
 

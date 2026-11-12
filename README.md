@@ -192,18 +192,3 @@ contains 17 attack types that do not occur in KDDTrain+ (3,750 records), and R2L
 three times more frequent in test than in train. The `difficulty` column, the number of
 21 reference learners that classified a record correctly, defines the KDDTest-21 hard
 subset. Files are in `data/`; source: [defcom17/NSL_KDD](https://github.com/defcom17/NSL_KDD).
-
-## Citation and license
-
-Code and report are released under the MIT License (see [LICENSE](LICENSE)). A
-machine-readable citation is in [CITATION.cff](CITATION.cff); GitHub shows it under
-"Cite this repository".
-
-```bibtex
-@software{majhi2026nids,
-  author = {Majhi, Sayan},
-  title  = {Intelligent Network Intrusion Detection System Using Machine Learning: an autoencoder-augmented stacked ensemble with novelty-aware stacking},
-  year   = {2026},
-  url    = {https://github.com/SayanMajhi/Intelligent-Network-Intrusion-Detection-System}
-}
-```
