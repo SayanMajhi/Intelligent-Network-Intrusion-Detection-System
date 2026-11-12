@@ -23,7 +23,6 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-sys.path.insert(0, str(ROOT / "experiments"))
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import roc_curve
@@ -33,7 +32,7 @@ from config import CLASS_ORDER, N_SELECTED_FEATURES, RANDOM_STATE
 from data_loader import load_nsl_kdd
 from evaluate import compute_metrics
 from feature_selection import hybrid_rank_selection
-from kitnet_lite import KitNETLite
+from subspace_autoencoder import KitNETLite
 from models import build_aese
 from preprocessing import preprocess
 

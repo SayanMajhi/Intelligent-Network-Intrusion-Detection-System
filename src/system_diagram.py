@@ -4,7 +4,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-from config import FIGURES, REPORT_FIGURES
+from config import FIGURES
 
 
 def box(ax, x, y, w, h, text, fc="#E8F0FE", ec="#1A56DB", fs=8.5, bold=False):
@@ -56,6 +56,5 @@ ax.text(13.0, 3.9, "anomaly\nscore", fontsize=8, color="#047857")
 
 ax.set_title("Figure 1. Block diagram of the proposed AESE-NIDS (Autoencoder-augmented Stacked Ensemble)", fontsize=11, pad=8)
 fig.tight_layout()
-for d in (FIGURES, REPORT_FIGURES):
-    fig.savefig(d / "fig_system_diagram.png", dpi=200, bbox_inches="tight")
+fig.savefig(FIGURES / "fig_system_diagram.png", dpi=200, bbox_inches="tight")
 print("saved fig_system_diagram.png")

@@ -1,5 +1,6 @@
 .venv/
 __pycache__/
 *.pyc
-data/processed/
-results/models/*.joblib
+.idea/
+results/models/
+results/predictions*.csv

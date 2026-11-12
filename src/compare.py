@@ -1,14 +1,14 @@
 """Compare the proposed model against results reported in the literature on KDDTest+.
 
 Values for prior work are the overall accuracies reported in the cited papers
-(see report/REPORT.md, References). Our numbers are read from results/tables.
+(see docs/report/REPORT.md, References). Our numbers are read from results/tables.
 """
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from config import FIGURES, REPORT_FIGURES, TABLES
+from config import FIGURES, TABLES
 from evaluate import PALETTE
 
 LITERATURE = [
@@ -51,8 +51,7 @@ def main():
             ax.text(v + 0.3, i, f"{v:.2f}", va="center", fontsize=8)
         ax.set_xlim(60, 100); ax.set_title(title); ax.tick_params(axis="y", labelsize=7.5)
     fig.tight_layout()
-    for d in (FIGURES, REPORT_FIGURES):
-        fig.savefig(d / "fig_literature_comparison.png", dpi=200, bbox_inches="tight")
+    fig.savefig(FIGURES / "fig_literature_comparison.png", dpi=200, bbox_inches="tight")
     print("saved fig_literature_comparison.png")
 
 

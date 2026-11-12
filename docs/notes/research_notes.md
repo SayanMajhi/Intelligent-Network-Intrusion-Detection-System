@@ -5,7 +5,7 @@ ends in because they're half the point: most of what I learned came from things 
 didn't work the first time. Numbers here are copied from `experiments/results.csv` and
 `results/tables/`, which the scripts write automatically, so they can be re-checked.
 
-Papers I read are in `experiments/papers/` (PDFs + extracted text).
+Papers I read are in `docs/papers/`.
 
 ---
 
@@ -143,7 +143,7 @@ What I took from it:
   unsupervised signal should be *inside* the model. That was my original motivation, so
   good to see it argued by people who shipped it.
 
--> Experiments E3/E4/E5/E6: re-implement KitNET offline (`experiments/kitnet_lite.py`),
+-> Experiments E3/E4/E5/E6: re-implement KitNET offline (`src/subspace_autoencoder.py`),
 feed the per-subspace RMSE vector to the meta-learner (E3), try the KitNET output score
 as a drop-in for my single AE score (E4), both together (E5), sweep m (E6).
 -> Experiment E7: detection rate at fixed false-alarm budgets.
@@ -204,8 +204,7 @@ not adopted.
 
 ### 3.3 E3 – Kitsune-style subspace anomaly vector (the one that worked)
 
-Re-implemented KitNET offline (`experiments/kitnet_lite.py`, now also
-`src/subspace_autoencoder.py`): correlation-distance clustering of the 122 columns on
+Re-implemented KitNET offline (`src/subspace_autoencoder.py`): correlation-distance clustering of the 122 columns on
 benign training rows, cut until no group has more than m = 10 features → 31 subspaces;
 one small AE per subspace (hidden = ceil(0.75·dim)); 0-1 normalised RMSE per subspace;
 an output AE over the 31 RMSEs for the KitNET score. The groups it found make sense on

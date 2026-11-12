@@ -163,7 +163,7 @@ A single reconstruction error compresses everything that is unusual about a reco
 
 $$\mathbf{g}(x) = \left[ \tilde{r}_1(x), \dots, \tilde{r}_k(x) \right], \qquad r_j(x) = \sqrt{\tfrac{1}{|G_j|} \sum_{i \in G_j} (x_i - \hat{x}_i)^2},$$
 
-with each $r_j$ min-max scaled by its benign training range and clipped to $[0,1]$. For the binary task the fused representation is $\hat{z} = [z, \mathbf{g}(x)] \in [0,1]^{40+k}$ and all $k$ profile columns are passed through to the meta-learner. The intuition is that a SYN flood is abnormal in the error-rate subspace and nowhere else, whereas a remote-to-local attack is abnormal in the login/content subspace and looks ordinary in the traffic subspaces; a learned combiner can exploit that structure, a single score cannot. The five-class model keeps the single-score representation of Section 3.5, because the experiments in Section 4.10 show that the profile helps the binary task but hurts the rare families. This component was added after the paper study documented in the accompanying research notes (`experiments/RESEARCH_NOTES.md`).
+with each $r_j$ min-max scaled by its benign training range and clipped to $[0,1]$. For the binary task the fused representation is $\hat{z} = [z, \mathbf{g}(x)] \in [0,1]^{40+k}$ and all $k$ profile columns are passed through to the meta-learner. The intuition is that a SYN flood is abnormal in the error-rate subspace and nowhere else, whereas a remote-to-local attack is abnormal in the login/content subspace and looks ordinary in the traffic subspaces; a learned combiner can exploit that structure, a single score cannot. The five-class model keeps the single-score representation of Section 3.5, because the experiments in Section 4.10 show that the profile helps the binary task but hurts the rare families. This component was added after the paper study documented in the accompanying research notes (`docs/notes/research_notes.md`).
 
 ### 3.6 Novelty-aware stacked heterogeneous ensemble
 
@@ -425,7 +425,7 @@ Table 12. Results on KDDTest-21 (11,850 records; %). Remaining baselines are in 
 
 Table 13. Detection rate (%) on KDDTest+ at fixed false-alarm budgets (binary).
 
-**How the final design was reached.** The subspace profile was not part of the first design. After the first version of this report (single anomaly score, novelty-aware stacking, 84.11% binary accuracy) three papers were studied in detail and each was turned into a logged experiment (`experiments/results.csv`, discussed in `experiments/RESEARCH_NOTES.md`): the KDDTest-21 evaluation from Tavallaee et al. [1]; the use of the autoencoder's bottleneck code as classifier features, after Shone et al. [6], which raised binary accuracy to 84.94% and unseen-attack detection to 70.37% but lowered five-class accuracy to 76.02% and was not adopted; and the subspace autoencoder ensemble of Mirsky et al. [19], tried in three forms (its output score as a single feature, 85.61%; its 31 subspace errors as meta-features, 86.52%; both together with the single score, 85.34%) and with m in {5, 10, 20} (83.71%, 86.52%, 86.57%). The 31-error profile with m = 10 was adopted for the binary task. The lesson of the study is that none of the published ideas worked as a drop-in; what worked was taking one mechanism, subspace-wise reconstruction error, and giving it to the one component of the pipeline that had been trained to know when an anomaly signal should be trusted.
+**How the final design was reached.** The subspace profile was not part of the first design. After the first version of this report (single anomaly score, novelty-aware stacking, 84.11% binary accuracy) three papers were studied in detail and each was turned into a logged experiment (`experiments/results.csv`, discussed in `docs/notes/research_notes.md`): the KDDTest-21 evaluation from Tavallaee et al. [1]; the use of the autoencoder's bottleneck code as classifier features, after Shone et al. [6], which raised binary accuracy to 84.94% and unseen-attack detection to 70.37% but lowered five-class accuracy to 76.02% and was not adopted; and the subspace autoencoder ensemble of Mirsky et al. [19], tried in three forms (its output score as a single feature, 85.61%; its 31 subspace errors as meta-features, 86.52%; both together with the single score, 85.34%) and with m in {5, 10, 20} (83.71%, 86.52%, 86.57%). The 31-error profile with m = 10 was adopted for the binary task. The lesson of the study is that none of the published ideas worked as a drop-in; what worked was taking one mechanism, subspace-wise reconstruction error, and giving it to the one component of the pipeline that had been trained to know when an anomaly signal should be trusted.
 
 ---
 
@@ -524,7 +524,7 @@ The study also exposes three limitations that are stated rather than hidden. The
 
 ## 8. Complete Code of Implementation
 
-The full implementation is contained in the `src/` directory of the accompanying project (`NIDS-ML/`). The listing below reproduces every source file. The experiment is reproduced with `python src/train.py` followed by `python src/compare.py`; the paper-inspired experiments of Section 4.10 with `python experiments/run_experiments.py`; the Word version of this report is regenerated with `python report/build_docx.py`.
+The full implementation is contained in the `src/` directory of the accompanying repository. The listing below reproduces every source file. The experiment is reproduced with `python src/train.py` followed by `python src/compare.py`; the paper-inspired experiments of Section 4.10 with `python experiments/run_experiments.py`; the Word version of this report is regenerated with `python docs/report/build_docx.py`.
 
 ### src/config.py
 
@@ -533,15 +533,13 @@ The full implementation is contained in the `src/` directory of the accompanying
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_RAW = ROOT / "data" / "raw"
-DATA_PROCESSED = ROOT / "data" / "processed"
+DATA_RAW = ROOT / "data"
 RESULTS = ROOT / "results"
-FIGURES = RESULTS / "figures"
+FIGURES = ROOT / "docs" / "report" / "figures"   # figures are written once, where the report reads them
 TABLES = RESULTS / "tables"
 MODELS = RESULTS / "models"
-REPORT_FIGURES = ROOT / "report" / "figures"
 
-for _p in (DATA_PROCESSED, FIGURES, TABLES, MODELS, REPORT_FIGURES):
+for _p in (FIGURES, TABLES, MODELS):
     _p.mkdir(parents=True, exist_ok=True)
 
 TRAIN_FILE = DATA_RAW / "KDDTrain+.txt"
@@ -1151,7 +1149,7 @@ Pipeline
   4. Normal-profile autoencoder -> reconstruction-error feature
   5. Stacked heterogeneous ensemble (RF, ET, XGB, LGBM -> LR meta-learner)
   6. Evaluate binary and 5-class tasks against baselines + ablations
-All tables are written to results/tables and all figures to results/figures.
+All tables are written to results/tables and all figures to docs/report/figures.
 """
 import json
 import time
@@ -1171,7 +1169,7 @@ from sklearn.preprocessing import LabelEncoder
 from autoencoder import NormalProfileAutoencoder
 from subspace_autoencoder import KitNETLite
 from config import (CLASS_ORDER, FIGURES, MODELS, N_SELECTED_FEATURES, RANDOM_STATE,
-                    REPORT_FIGURES, SUBSPACE_MAX_SIZE, TABLES)
+                    SUBSPACE_MAX_SIZE, TABLES)
 from data_loader import load_nsl_kdd
 from evaluate import PALETTE, compute_metrics, plot_bar, plot_confusion, plot_roc
 from feature_selection import hybrid_rank_selection
@@ -1193,19 +1191,8 @@ def toc(name):
 
 
 def save_fig(fig, name):
-    for d in (FIGURES, REPORT_FIGURES):
-        fig.savefig(d / name, dpi=200)
+    fig.savefig(FIGURES / name, dpi=200)
     plt.close(fig)
-
-
-def both(name):
-    """Return the results path; the figure is copied to the report folder too."""
-    return FIGURES / name
-
-
-def copy_to_report(name):
-    import shutil
-    shutil.copy(FIGURES / name, REPORT_FIGURES / name)
 
 
 # --------------------------------------------------------------------------- #
@@ -1460,17 +1447,13 @@ print(f"   CV accuracy = {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
 # Figures
 plot_confusion(y_test_bin, bin_preds["Proposed AESE-NIDS"], ["Normal", "Attack"],
                "Proposed AESE-NIDS: binary confusion matrix (KDDTest+)", FIGURES / "fig_cm_binary.png")
-copy_to_report("fig_cm_binary.png")
 plot_confusion(y_test_mc, mc_preds["Proposed AESE-NIDS"], list(le.classes_),
                "Proposed AESE-NIDS: 5-class confusion matrix (KDDTest+)", FIGURES / "fig_cm_multiclass.png")
-copy_to_report("fig_cm_multiclass.png")
-plot_roc(bin_roc, FIGURES / "fig_roc_binary.png"); copy_to_report("fig_roc_binary.png")
+plot_roc(bin_roc, FIGURES / "fig_roc_binary.png")
 plot_bar(bin_df.drop(index=["Autoencoder only (unsupervised)", "Subspace AE ensemble only (unsupervised)"]), ["accuracy", "precision", "recall", "f1"],
          FIGURES / "fig_binary_comparison.png", "Binary classification on KDDTest+", ylim=(50, 100))
-copy_to_report("fig_binary_comparison.png")
 plot_bar(mc_df, ["accuracy", "precision", "recall", "f1"], FIGURES / "fig_multiclass_comparison.png",
          "5-class classification on KDDTest+ (macro-averaged P/R/F1)", ylim=(30, 100))
-copy_to_report("fig_multiclass_comparison.png")
 
 fig, ax = plt.subplots(figsize=(11, 5))
 piv = ablation_df.pivot(index="configuration", columns="task", values="accuracy").loc[list(configs)] * 100
@@ -1513,7 +1496,7 @@ summary = {
 }
 with open(TABLES / "summary.json", "w") as f:
     json.dump(summary, f, indent=2, default=float)
-print("\nDone. Tables -> results/tables, figures -> results/figures")
+print("\nDone. Tables -> results/tables, figures -> docs/report/figures")
 ```
 
 ### src/compare.py
@@ -1522,14 +1505,14 @@ print("\nDone. Tables -> results/tables, figures -> results/figures")
 """Compare the proposed model against results reported in the literature on KDDTest+.
 
 Values for prior work are the overall accuracies reported in the cited papers
-(see report/REPORT.md, References). Our numbers are read from results/tables.
+(see docs/report/REPORT.md, References). Our numbers are read from results/tables.
 """
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from config import FIGURES, REPORT_FIGURES, TABLES
+from config import FIGURES, TABLES
 from evaluate import PALETTE
 
 LITERATURE = [
@@ -1572,8 +1555,7 @@ def main():
             ax.text(v + 0.3, i, f"{v:.2f}", va="center", fontsize=8)
         ax.set_xlim(60, 100); ax.set_title(title); ax.tick_params(axis="y", labelsize=7.5)
     fig.tight_layout()
-    for d in (FIGURES, REPORT_FIGURES):
-        fig.savefig(d / "fig_literature_comparison.png", dpi=200, bbox_inches="tight")
+    fig.savefig(FIGURES / "fig_literature_comparison.png", dpi=200, bbox_inches="tight")
     print("saved fig_literature_comparison.png")
 
 
@@ -1587,7 +1569,7 @@ if __name__ == "__main__":
 """Score new NSL-KDD-formatted records with the trained AESE-NIDS.
 
 Usage:
-    python src/predict.py data/raw/KDDTest+.txt [--out predictions.csv]
+    python src/predict.py data/KDDTest+.txt [--out predictions.csv]
 """
 import argparse
 
@@ -1639,7 +1621,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-from config import FIGURES, REPORT_FIGURES
+from config import FIGURES
 
 
 def box(ax, x, y, w, h, text, fc="#E8F0FE", ec="#1A56DB", fs=8.5, bold=False):
@@ -1660,11 +1642,11 @@ ax.set_xlim(-0.2, 13.8); ax.set_ylim(0, 7.2); ax.axis("off")
 box(ax, 0.3, 5.6, 2.1, 1.0, "NSL-KDD traffic records\n(41 features)\nKDDTrain+ / KDDTest+", fc="#FFF4E5", ec="#B45309", bold=True)
 box(ax, 2.9, 5.6, 2.4, 1.0, "Pre-processing\n• log1p on heavy-tailed counters\n• Min-Max scaling\n• One-hot (protocol, service, flag)")
 box(ax, 5.8, 5.6, 3.0, 1.0, "Hybrid Rank-Aggregated Feature Selection\nMI rank + ANOVA-F rank + Extra-Trees rank\n→ Borda fusion → top-k = 40")
-box(ax, 9.3, 5.6, 3.4, 1.0, "Normal-profile Autoencoder (122-32-8-32-122)\ntrained on benign traffic only, all 122 columns\n→ reconstruction error = anomaly score", fc="#ECFDF5", ec="#047857")
+box(ax, 9.3, 5.6, 3.4, 1.0, "Benign-only anomaly features (all 122 columns)\n• single AE 122-32-8-32-122 → 1 score (5-class task)\n• 31 subspace AEs, m=10 → error profile (binary task)", fc="#ECFDF5", ec="#047857")
 arrow(ax, (2.4, 6.1), (2.9, 6.1)); arrow(ax, (5.3, 6.1), (5.8, 6.1)); arrow(ax, (5.3, 6.4), (9.3, 6.4), connectionstyle="arc3,rad=-0.25")
 
 # Fused representation
-box(ax, 4.2, 4.0, 4.6, 0.75, "Fused representation: 40 selected features + 1 anomaly-score feature (41-D)", fc="#F3E8FF", ec="#6D28D9", bold=True)
+box(ax, 4.2, 3.95, 4.6, 0.85, "Fused representation: 40 selected features + anomaly features\n(41-D for 5-class, 40 + 31 = 71-D for binary)", fc="#F3E8FF", ec="#6D28D9", bold=True)
 arrow(ax, (7.3, 5.6), (6.5, 4.75)); arrow(ax, (11.0, 5.6), (8.5, 4.75))
 
 # Level-0 learners
@@ -1677,7 +1659,7 @@ for x, n in zip(xs, names):
 ax.text(1.2, 3.3, "Level-0 learners  (dual-regime OOF: stratified folds + attack-type-grouped folds)", fontsize=8, va="bottom", color="#444")
 
 # Meta learner
-box(ax, 3.2, 0.9, 6.0, 0.8, "Level-1 meta-learner: Logistic Regression\non stacked OOF probabilities + AE anomaly score", fc="#FEE2E2", ec="#B91C1C", bold=True)
+box(ax, 3.2, 0.9, 6.0, 0.8, "Level-1 meta-learner: Logistic Regression\non stacked OOF probabilities + anomaly features", fc="#FEE2E2", ec="#B91C1C", bold=True)
 for x in xs:
     arrow(ax, (x + 1.25, 2.3), (6.2, 1.7))
 
@@ -1691,8 +1673,7 @@ ax.text(13.0, 3.9, "anomaly\nscore", fontsize=8, color="#047857")
 
 ax.set_title("Figure 1. Block diagram of the proposed AESE-NIDS (Autoencoder-augmented Stacked Ensemble)", fontsize=11, pad=8)
 fig.tight_layout()
-for d in (FIGURES, REPORT_FIGURES):
-    fig.savefig(d / "fig_system_diagram.png", dpi=200, bbox_inches="tight")
+fig.savefig(FIGURES / "fig_system_diagram.png", dpi=200, bbox_inches="tight")
 print("saved fig_system_diagram.png")
 ```
 
@@ -1724,7 +1705,6 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-sys.path.insert(0, str(ROOT / "experiments"))
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import roc_curve
@@ -1734,7 +1714,7 @@ from config import CLASS_ORDER, N_SELECTED_FEATURES, RANDOM_STATE
 from data_loader import load_nsl_kdd
 from evaluate import compute_metrics
 from feature_selection import hybrid_rank_selection
-from kitnet_lite import KitNETLite
+from subspace_autoencoder import KitNETLite
 from models import build_aese
 from preprocessing import preprocess
 
@@ -1887,10 +1867,10 @@ if want("E7") and want("E3"):
 print(f"all done in {(time.time()-t0)/60:.1f} min")
 ```
 
-### report/build_docx.py
+### docs/report/build_docx.py
 
 ```python
-"""Convert report/REPORT.md into a formatted Word document (10 pt, single spacing).
+"""Convert docs/report/REPORT.md into a formatted Word document (10 pt, single spacing).
 
 Supported markdown: #/##/### headings, paragraphs, bullet lists (- ), numbered
 lists (1. ), pipe tables, images ![caption](path), **bold** and *italic* runs,

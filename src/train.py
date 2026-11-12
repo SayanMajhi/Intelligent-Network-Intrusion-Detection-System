@@ -7,7 +7,7 @@ Pipeline
   4. Normal-profile autoencoder -> reconstruction-error feature
   5. Stacked heterogeneous ensemble (RF, ET, XGB, LGBM -> LR meta-learner)
   6. Evaluate binary and 5-class tasks against baselines + ablations
-All tables are written to results/tables and all figures to results/figures.
+All tables are written to results/tables and all figures to docs/report/figures.
 """
 import json
 import time
@@ -27,7 +27,7 @@ from sklearn.preprocessing import LabelEncoder
 from autoencoder import NormalProfileAutoencoder
 from subspace_autoencoder import KitNETLite
 from config import (CLASS_ORDER, FIGURES, MODELS, N_SELECTED_FEATURES, RANDOM_STATE,
-                    REPORT_FIGURES, SUBSPACE_MAX_SIZE, TABLES)
+                    SUBSPACE_MAX_SIZE, TABLES)
 from data_loader import load_nsl_kdd
 from evaluate import PALETTE, compute_metrics, plot_bar, plot_confusion, plot_roc
 from feature_selection import hybrid_rank_selection
@@ -49,19 +49,8 @@ def toc(name):
 
 
 def save_fig(fig, name):
-    for d in (FIGURES, REPORT_FIGURES):
-        fig.savefig(d / name, dpi=200)
+    fig.savefig(FIGURES / name, dpi=200)
     plt.close(fig)
-
-
-def both(name):
-    """Return the results path; the figure is copied to the report folder too."""
-    return FIGURES / name
-
-
-def copy_to_report(name):
-    import shutil
-    shutil.copy(FIGURES / name, REPORT_FIGURES / name)
 
 
 # --------------------------------------------------------------------------- #
@@ -316,17 +305,13 @@ print(f"   CV accuracy = {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
 # Figures
 plot_confusion(y_test_bin, bin_preds["Proposed AESE-NIDS"], ["Normal", "Attack"],
                "Proposed AESE-NIDS: binary confusion matrix (KDDTest+)", FIGURES / "fig_cm_binary.png")
-copy_to_report("fig_cm_binary.png")
 plot_confusion(y_test_mc, mc_preds["Proposed AESE-NIDS"], list(le.classes_),
                "Proposed AESE-NIDS: 5-class confusion matrix (KDDTest+)", FIGURES / "fig_cm_multiclass.png")
-copy_to_report("fig_cm_multiclass.png")
-plot_roc(bin_roc, FIGURES / "fig_roc_binary.png"); copy_to_report("fig_roc_binary.png")
+plot_roc(bin_roc, FIGURES / "fig_roc_binary.png")
 plot_bar(bin_df.drop(index=["Autoencoder only (unsupervised)", "Subspace AE ensemble only (unsupervised)"]), ["accuracy", "precision", "recall", "f1"],
          FIGURES / "fig_binary_comparison.png", "Binary classification on KDDTest+", ylim=(50, 100))
-copy_to_report("fig_binary_comparison.png")
 plot_bar(mc_df, ["accuracy", "precision", "recall", "f1"], FIGURES / "fig_multiclass_comparison.png",
          "5-class classification on KDDTest+ (macro-averaged P/R/F1)", ylim=(30, 100))
-copy_to_report("fig_multiclass_comparison.png")
 
 fig, ax = plt.subplots(figsize=(11, 5))
 piv = ablation_df.pivot(index="configuration", columns="task", values="accuracy").loc[list(configs)] * 100
@@ -369,4 +354,4 @@ summary = {
 }
 with open(TABLES / "summary.json", "w") as f:
     json.dump(summary, f, indent=2, default=float)
-print("\nDone. Tables -> results/tables, figures -> results/figures")
+print("\nDone. Tables -> results/tables, figures -> docs/report/figures")

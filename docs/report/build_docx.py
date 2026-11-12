@@ -1,4 +1,4 @@
-"""Convert report/REPORT.md into a formatted Word document (10 pt, single spacing).
+"""Convert docs/report/REPORT.md into a formatted Word document (10 pt, single spacing).
 
 Supported markdown: #/##/### headings, paragraphs, bullet lists (- ), numbered
 lists (1. ), pipe tables, images ![caption](path), **bold** and *italic* runs,

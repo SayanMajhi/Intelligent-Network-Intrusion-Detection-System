@@ -1,7 +1,7 @@
 """Score new NSL-KDD-formatted records with the trained AESE-NIDS.
 
 Usage:
-    python src/predict.py data/raw/KDDTest+.txt [--out predictions.csv]
+    python src/predict.py data/KDDTest+.txt [--out predictions.csv]
 """
 import argparse
 

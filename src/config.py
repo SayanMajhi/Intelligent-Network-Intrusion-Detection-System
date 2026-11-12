@@ -2,15 +2,13 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_RAW = ROOT / "data" / "raw"
-DATA_PROCESSED = ROOT / "data" / "processed"
+DATA_RAW = ROOT / "data"
 RESULTS = ROOT / "results"
-FIGURES = RESULTS / "figures"
+FIGURES = ROOT / "docs" / "report" / "figures"   # figures are written once, where the report reads them
 TABLES = RESULTS / "tables"
 MODELS = RESULTS / "models"
-REPORT_FIGURES = ROOT / "report" / "figures"
 
-for _p in (DATA_PROCESSED, FIGURES, TABLES, MODELS, REPORT_FIGURES):
+for _p in (FIGURES, TABLES, MODELS):
     _p.mkdir(parents=True, exist_ok=True)
 
 TRAIN_FILE = DATA_RAW / "KDDTrain+.txt"
